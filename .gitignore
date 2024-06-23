@@ -1,0 +1,3 @@
+# Ignore build output and debug files
+/obj/
+/bin/
