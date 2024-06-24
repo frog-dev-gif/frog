@@ -1,4 +1,0 @@
-Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
-"c:/Users/brody/Frog/Content/Background.png","c:/Users/brody/Frog/Content/bin/DesktopGL/Background.xnb","TextureProcessor","Texture2DContent",4113,1638485,0.1247982
-"c:/Users/brody/Frog/Content/idle.png","c:/Users/brody/Frog/Content/bin/DesktopGL/idle.xnb","TextureProcessor","Texture2DContent",339,25685,0.0015874
-"c:/Users/brody/Frog/Content/movement-export.png","c:/Users/brody/Frog/Content/bin/DesktopGL/movement-export.xnb","TextureProcessor","Texture2DContent",239,51285,0.0023388
