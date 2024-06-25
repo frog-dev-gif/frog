@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -69,7 +68,7 @@ namespace FrogGame.Entities
             FrameCount = 2; // Number of frames in the sprite sheet
         }
 
-        public void Update(GameTime gameTime, KeyboardState kstate, int mapWidth, int mapHeight, bool[,] collisionMap, int tileSize)
+        public void Update(GameTime gameTime, KeyboardState kstate, int v, int v1)
         {
             IsMoving = false;
 
@@ -112,112 +111,39 @@ namespace FrogGame.Entities
                 Debug.WriteLine("Moving Down");
             }
 
-            // Check for collisions
-            if (!IsCollision(newPosition, mapWidth, mapHeight, collisionMap, tileSize))
-            {
-                Position = newPosition;
-            }
-
-            // Update animation frame if moving
-            if (IsMoving)
-            {
-                TotalElapsed += gameTime.ElapsedGameTime.TotalSeconds;
-                if (TotalElapsed > TimePerFrame)
-                {
-                    CurrentFrame++;
-                    if (CurrentFrame >= FrameCount)
-                    {
-                        CurrentFrame = 0;
-                    }
-                    TotalElapsed -= TimePerFrame;
-                    Debug.WriteLine($"Animation Frame: {CurrentFrame}");
-                }
-            }
-            else
-            {
-                MovementDirection = "idle";
-                TotalElapsed += gameTime.ElapsedGameTime.TotalSeconds;
-                if (TotalElapsed > TimePerFrame)
-                {
-                    CurrentFrame++;
-                    if (CurrentFrame >= FrameCount)
-                    {
-                        CurrentFrame = 0;
-                    }
-                    TotalElapsed -= TimePerFrame;
-                    Debug.WriteLine($"Animation Frame: {CurrentFrame}");
-                }
-            }
+            // Animation frame update is handled separately
         }
-        private bool IsCollision(Vector2 position, int mapWidth, int mapHeight, bool[,] collisionMap, int tileSize)
+
+        public void UpdateAnimation(GameTime gameTime)
         {
-            // Define a margin to allow slight overlaps
-            int margin = 2;
-
-            // Calculate the bounding box of the frog with the margin
-            Rectangle frogBounds = new Rectangle(
-                (int)(position.X - RenderWidth / 2) + margin,
-                (int)(position.Y - RenderHeight / 2) + margin,
-                RenderWidth - 2 * margin,
-                RenderHeight - 2 * margin
-            );
-
-            // Check each corner of the frog's bounding box
-            for (int x = frogBounds.Left; x <= frogBounds.Right; x += tileSize)
+            TotalElapsed += gameTime.ElapsedGameTime.TotalSeconds;
+            if (TotalElapsed > TimePerFrame)
             {
-                for (int y = frogBounds.Top; y <= frogBounds.Bottom; y += tileSize)
+                CurrentFrame++;
+                if (CurrentFrame >= FrameCount)
                 {
-                    int tileX = x / tileSize;
-                    int tileY = y / tileSize;
-
-                    if (tileX >= 0 && tileX < mapWidth && tileY >= 0 && tileY < mapHeight)
-                    {
-                        if (collisionMap[tileY, tileX])
-                        {
-                            return true;
-                        }
-                    }
+                    CurrentFrame = 0;
                 }
+                TotalElapsed -= TimePerFrame;
+                Debug.WriteLine($"Animation Frame: {CurrentFrame}");
             }
-
-            // Additionally, check the exact right and bottom edges if they don't align with tileSize steps
-            if (frogBounds.Right % tileSize != 0)
-            {
-                for (int y = frogBounds.Top; y <= frogBounds.Bottom; y += tileSize)
-                {
-                    int tileX = frogBounds.Right / tileSize;
-                    int tileY = y / tileSize;
-
-                    if (tileX >= 0 && tileX < mapWidth && tileY >= 0 && tileY < mapHeight)
-                    {
-                        if (collisionMap[tileY, tileX])
-                        {
-                            return true;
-                        }
-                    }
-                }
-            }
-
-            if (frogBounds.Bottom % tileSize != 0)
-            {
-                for (int x = frogBounds.Left; x <= frogBounds.Right; x += tileSize)
-                {
-                    int tileX = x / tileSize;
-                    int tileY = frogBounds.Bottom / tileSize;
-
-                    if (tileX >= 0 && tileX < mapWidth && tileY >= 0 && tileY < mapHeight)
-                    {
-                        if (collisionMap[tileY, tileX])
-                        {
-                            return true;
-                        }
-                    }
-                }
-            }
-
-            return false;
         }
 
+        public void ResetAnimation()
+        {
+            MovementDirection = "idle";
+            TotalElapsed += TimePerFrame;
+            if (TotalElapsed > TimePerFrame)
+            {
+                CurrentFrame++;
+                if (CurrentFrame >= FrameCount)
+                {
+                    CurrentFrame = 0;
+                }
+                TotalElapsed -= TimePerFrame;
+                Debug.WriteLine($"Animation Frame: {CurrentFrame}");
+            }
+        }
 
         public void Draw(SpriteBatch spriteBatch)
         {
