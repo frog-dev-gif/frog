@@ -57,7 +57,6 @@ namespace FrogGame.Entities
 
         public void LoadContent(ContentManager content)
         {
-            IdleTexture = content.Load<Texture2D>("idle");
             IdleAnimation = content.Load<Texture2D>("idle-animation");
             MovementSpriteSheet = content.Load<Texture2D>("movement-export");
             UpMovementSpriteSheet = content.Load<Texture2D>("up-sprite");

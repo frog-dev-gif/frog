@@ -1,82 +1,57 @@
-﻿using System.IO;
-using System.Linq;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using TiledSharp;
+using MonoGame.Extended.Tiled;
+using MonoGame.Extended.Tiled.Renderers;
+
+using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace FrogGame.World
 {
     public class TileMap
     {
-        public int[,] Map { get; private set; }
+        private TiledMap _tiledMap;
+        private TiledMapRenderer _tiledMapRenderer;
         public bool[,] CollisionMap { get; private set; }
-        public Dictionary<int, Texture2D> TileTextures { get; private set; }
         public int TileSize { get; private set; }
 
         public TileMap()
         {
             TileSize = 32;
-            TileTextures = new Dictionary<int, Texture2D>();
         }
 
-        public void LoadContent(ContentManager content)
+    public void LoadContent(ContentManager content, GraphicsDevice graphicsDevice)
+    {
+        _tiledMap = content.Load<TiledMap>("test-map/test-map");
+        _tiledMapRenderer = new TiledMapRenderer(graphicsDevice, _tiledMap);
+
+        // Initialize CollisionMap
+        int mapWidth = _tiledMap.Width;
+        int mapHeight = _tiledMap.Height;
+        CollisionMap = new bool[mapHeight, mapWidth];
+
+        // Assuming the first tile layer is your collision layer
+        var collisionLayer = _tiledMap.TileLayers[0];
+
+        for (int y = 0; y < mapHeight; y++)
         {
-            // Load and parse the TMX map
-            var map = new TmxMap("Content/test-map/Level_0.tmx");
-
-            // Load tilesets
-            foreach (var tileset in map.Tilesets)
+            for (int x = 0; x < mapWidth; x++)
             {
-                string tilesetPath = Path.Combine("Content/test-map", Path.GetFileNameWithoutExtension(tileset.Image.Source));
-                TileTextures[tileset.FirstGid] = content.Load<Texture2D>(tilesetPath);
-            }
-
-            int width = map.Width;
-            int height = map.Height;
-            Map = new int[height, width];
-            CollisionMap = new bool[height, width];
-
-            var layer = map.Layers.First(l => l.Name == "IntGrid");
-
-            for (int y = 0; y < height; y++)
-            {
-                for (int x = 0; x < width; x++)
-                {
-                    int value = layer.Tiles[y * width + x].Gid;
-                    Map[y, x] = value;
-                    CollisionMap[y, x] = (value == 1); // Assuming 1 is the collidable tile
-                }
+                // Assume any non-zero tile is collidable
+                CollisionMap[y, x] = collisionLayer.GetTile((ushort)x, (ushort)y).GlobalIdentifier != 0;
             }
         }
-
-        public void Draw(SpriteBatch spriteBatch)
+    }
+        public void Draw(Matrix viewMatrix)
         {
-            for (int y = 0; y < Map.GetLength(0); y++)
-            {
-                for (int x = 0; x < Map.GetLength(1); x++)
-                {
-                    int tileGid = Map[y, x];
-                    if (tileGid == 0) continue;
+            _tiledMapRenderer.Draw(viewMatrix);
+        }
 
-                    // Find the correct texture for the tile Gid
-                    int textureGid = TileTextures.Keys.Where(gid => gid <= tileGid).Max();
-                    Texture2D tileTexture = TileTextures[textureGid];
-                    
-                    int localTileId = tileGid - textureGid;
-                    int tilesPerRow = tileTexture.Width / TileSize;
-                    int tileX = (localTileId % tilesPerRow) * TileSize;
-                    int tileY = (localTileId / tilesPerRow) * TileSize;
-
-                    spriteBatch.Draw(
-                        tileTexture,
-                        new Rectangle(x * TileSize, y * TileSize, TileSize, TileSize),
-                        new Rectangle(tileX, tileY, TileSize, TileSize),
-                        Color.White
-                    );
-                }
-            }
+        public void Update(GameTime gameTime)
+        {
+            _tiledMapRenderer.Update(gameTime);
         }
     }
 }

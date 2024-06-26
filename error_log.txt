@@ -1,0 +1,32 @@
+TiledMap load error: Microsoft.Xna.Framework.Content.ContentLoadException: The content file was not found.
+ ---> System.IO.FileNotFoundException: Content\Frog\Content\test-map\tilesheet-1_0.xnb
+ ---> System.IO.DirectoryNotFoundException: Could not find a part of the path 'C:\Users\brody\Toad\bin\Debug\net6.0\Content\Frog\Content\test-map\tilesheet-1_0.xnb'.
+   at Microsoft.Win32.SafeHandles.SafeFileHandle.CreateFile(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options)
+   at Microsoft.Win32.SafeHandles.SafeFileHandle.Open(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize)
+   at System.IO.Strategies.OSFileStreamStrategy..ctor(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize)
+   at Microsoft.Xna.Framework.TitleContainer.PlatformOpenStream(String safeName)
+   at Microsoft.Xna.Framework.TitleContainer.OpenStream(String name)
+   at Microsoft.Xna.Framework.TitleContainer.OpenStream(String name)
+   at Microsoft.Xna.Framework.Content.ContentManager.OpenStream(String assetName)
+   --- End of inner exception stack trace ---
+   at Microsoft.Xna.Framework.Content.ContentManager.OpenStream(String assetName)
+   at Microsoft.Xna.Framework.Content.ContentManager.ReadAsset[T](String assetName, Action`1 recordDisposableObject)
+   at Microsoft.Xna.Framework.Content.ContentManager.Load[T](String assetName)
+   at Microsoft.Xna.Framework.Content.ContentReader.ReadExternalReference[T]()
+   at MonoGame.Extended.Tiled.TiledMapTilesetReader.ReadTileset(ContentReader reader)
+   at Microsoft.Xna.Framework.Content.ContentTypeReader`1.Read(ContentReader input, Object existingInstance)
+   at Microsoft.Xna.Framework.Content.ContentReader.InnerReadObject[T](T existingInstance)
+   at Microsoft.Xna.Framework.Content.ContentReader.ReadObject[T]()
+   at Microsoft.Xna.Framework.Content.ContentReader.ReadAsset[T]()
+   at Microsoft.Xna.Framework.Content.ContentManager.ReadAsset[T](String assetName, Action`1 recordDisposableObject)
+   at Microsoft.Xna.Framework.Content.ContentManager.Load[T](String assetName)
+   at Microsoft.Xna.Framework.Content.ContentReader.ReadExternalReference[T]()
+   at MonoGame.Extended.Tiled.TiledMapReader.ReadTilesets(ContentReader reader, TiledMap map)
+   at MonoGame.Extended.Tiled.TiledMapReader.Read(ContentReader reader, TiledMap existingInstance)
+   at Microsoft.Xna.Framework.Content.ContentTypeReader`1.Read(ContentReader input, Object existingInstance)
+   at Microsoft.Xna.Framework.Content.ContentReader.InnerReadObject[T](T existingInstance)
+   at Microsoft.Xna.Framework.Content.ContentReader.ReadObject[T]()
+   at Microsoft.Xna.Framework.Content.ContentReader.ReadAsset[T]()
+   at Microsoft.Xna.Framework.Content.ContentManager.ReadAsset[T](String assetName, Action`1 recordDisposableObject)
+   at Microsoft.Xna.Framework.Content.ContentManager.Load[T](String assetName)
+   at FrogGame.World.TileMap.LoadContent(ContentManager content, GraphicsDevice graphicsDevice) in C:\Users\brody\Toad\World\TileMap.cs:line 29
