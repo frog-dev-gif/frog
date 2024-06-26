@@ -26,7 +26,6 @@ namespace Toad
 
         public Game1()
         {
-            Log("Game1 constructor called");
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
@@ -34,13 +33,10 @@ namespace Toad
             _graphics.PreferredBackBufferWidth = 640;
             _graphics.PreferredBackBufferHeight = 480;
             _graphics.ApplyChanges();
-
-            Log("Game1 constructor done");
         }
 
         protected override void Initialize()
         {
-            Log("Initialize called");
             backgroundColor = new Color(99, 155, 255);
 
             _frog = new Frog();
@@ -51,12 +47,10 @@ namespace Toad
             _tileMap = new TileMap();
 
             base.Initialize();
-            Log("Initialize done");
         }
 
 protected override void LoadContent()
 {
-    Log("LoadContent called");
     _spriteBatch = new SpriteBatch(GraphicsDevice);
 
     _frog.LoadContent(Content);
@@ -69,21 +63,10 @@ protected override void LoadContent()
     int worldHeight = _tileMap.CollisionMap.GetLength(0) * _tileMap.TileSize;
     _camera = new Camera(_graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight, worldWidth, worldHeight);
 
-    Log("LoadContent done");
 }
 
         protected override void Update(GameTime gameTime)
         {
-            Log("Update called");
-                Log("Update called");
-    if (_tileMap == null)
-    {
-        Log("_tileMap is null in Update method");
-    }
-    if (_tileMap != null && _tileMap.CollisionMap == null)
-    {
-        Log("_tileMap.CollisionMap is null in Update method");
-    }
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
@@ -94,12 +77,10 @@ protected override void LoadContent()
             _tileMap.Update(gameTime);
 
             base.Update(gameTime);
-            Log("Update done");
         }
 
         private void UpdateFrog(GameTime gameTime, KeyboardState kstate)
         {
-            Log("UpdateFrog called");
             Vector2 newPosition = _frog.Position;
             bool isMoving = false;
 
@@ -142,7 +123,6 @@ protected override void LoadContent()
             {
                 _frog.ResetAnimation();
             }
-            Log("UpdateFrog done");
         }
 
         private bool IsCollision(Vector2 position)
@@ -150,7 +130,7 @@ protected override void LoadContent()
     if (_tileMap == null || _tileMap.CollisionMap == null)
     {
         Log("TileMap or CollisionMap is null in IsCollision method");
-        return false; // Or handle this case as appropriate for your game
+        return false; 
     }
 
     Rectangle frogBounds = new Rectangle((int)position.X - _frog.RenderWidth / 2, (int)position.Y - _frog.RenderHeight / 2, _frog.RenderWidth, _frog.RenderHeight);
@@ -177,7 +157,6 @@ protected override void LoadContent()
 }
         protected override void Draw(GameTime gameTime)
         {
-            Log("Draw called");
             GraphicsDevice.Clear(backgroundColor);
 
             _spriteBatch.Begin(transformMatrix: _camera.Transform);
@@ -188,7 +167,6 @@ protected override void LoadContent()
             _spriteBatch.End();
 
             base.Draw(gameTime);
-            Log("Draw done");
         }
     }
 }

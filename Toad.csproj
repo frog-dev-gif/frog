@@ -30,4 +30,10 @@
     <Message Text="Restoring dotnet tools" Importance="High" />
     <Exec Command="dotnet tool restore" />
   </Target>
+    <Target Name="RunGame">
+    <Exec Command="dotnet mgcb Content/Content.mgcb" />
+    <Exec Command="dotnet clean" />
+    <Exec Command="dotnet build" />
+    <Exec Command="dotnet run" />
+  </Target>
 </Project>
