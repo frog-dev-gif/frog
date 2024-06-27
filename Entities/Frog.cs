@@ -1,8 +1,9 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 namespace FrogGame.Entities
 {
@@ -36,18 +37,23 @@ namespace FrogGame.Entities
         public int RenderWidth { get; set; }
         public int RenderHeight { get; set; }
 
+        private const float ANIMATION_FPS = 4f;
+        private float _animationTimer = 0f;
+        public Vector2 TargetPosition { get; set; }
+
         public Frog()
         {
             Position = new Vector2();
-            Speed = 100f;
+            Speed = 128f; // Changed to 128f for grid-based movement
             CurrentFrame = 0;
-            TimePerFrame = 0.35; // Time per frame in seconds
+            TimePerFrame = 0.35;
             TotalElapsed = 0;
             IsFacingLeft = false;
             MovementDirection = "idle";
 
-            RenderWidth = 64; // Default render width
-            RenderHeight = 64; // Default render height
+            RenderWidth = 32;
+            RenderHeight = 32;
+            TargetPosition = Position;
         }
 
         public void Initialize(int startX, int startY)
@@ -57,163 +63,109 @@ namespace FrogGame.Entities
 
         public void LoadContent(ContentManager content)
         {
-            IdleAnimation = content.Load<Texture2D>("idle-animation");
-            MovementSpriteSheet = content.Load<Texture2D>("movement-export");
-            UpMovementSpriteSheet = content.Load<Texture2D>("up-sprite");
-            DownMovementSpriteSheet = content.Load<Texture2D>("down-sprite");
+            try
+            {
+                IdleAnimation = content.Load<Texture2D>("idle-animation");
+                MovementSpriteSheet = content.Load<Texture2D>("movement-export");
+                UpMovementSpriteSheet = content.Load<Texture2D>("up-sprite");
+                DownMovementSpriteSheet = content.Load<Texture2D>("down-sprite");
+                IdleTexture = content.Load<Texture2D>("idle-animation"); // Add this line if it's missing
+                Console.WriteLine("Successfully loaded textures:");
+                Console.WriteLine($"IdleAnimation: {IdleAnimation != null}");
+                Console.WriteLine($"MovementSpriteSheet: {MovementSpriteSheet != null}");
+                Console.WriteLine($"UpMovementSpriteSheet: {UpMovementSpriteSheet != null}");
+                Console.WriteLine($"DownMovementSpriteSheet: {DownMovementSpriteSheet != null}");
+                Console.WriteLine($"IdleTexture: {IdleTexture != null}");
 
-            FrameWidth = MovementSpriteSheet.Width;
-            FrameHeight = MovementSpriteSheet.Height / 2; // Adjust this based on your sprite sheet
-            FrameCount = 2; // Number of frames in the sprite sheet
+                if (IdleAnimation == null || MovementSpriteSheet == null ||
+                    UpMovementSpriteSheet == null || DownMovementSpriteSheet == null ||
+                    IdleTexture == null)
+                {
+                    throw new ContentLoadException("One or more textures failed to load.");
+                }
+
+                FrameWidth = MovementSpriteSheet.Width;
+                FrameHeight = MovementSpriteSheet.Height / 2;
+                FrameCount = 2;
+            }
+            catch (ContentLoadException e)
+            {
+                Console.WriteLine($"Error loading content: {e.Message}");
+                // You might want to throw this exception again if you want to stop the game from running
+            }
         }
-
-        public void Update(GameTime gameTime, KeyboardState kstate, int v, int v1)
-        {
-            IsMoving = false;
-
-            // Temporary new position for collision checking
-            Vector2 newPosition = Position;
-
-            // Handle left and right movement
-            if (kstate.IsKeyDown(Keys.Left))
-            {
-                newPosition.X -= Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                IsMoving = true;
-                IsFacingLeft = true;
-                MovementDirection = "left";
-                Debug.WriteLine("Moving Left");
-            }
-
-            if (kstate.IsKeyDown(Keys.Right))
-            {
-                newPosition.X += Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                IsMoving = true;
-                IsFacingLeft = false;
-                MovementDirection = "right";
-                Debug.WriteLine("Moving Right");
-            }
-
-            // Handle up and down movement
-            if (kstate.IsKeyDown(Keys.Up))
-            {
-                newPosition.Y -= Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                IsMoving = true;
-                MovementDirection = "up";
-                Debug.WriteLine("Moving Up");
-            }
-
-            if (kstate.IsKeyDown(Keys.Down))
-            {
-                newPosition.Y += Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                IsMoving = true;
-                MovementDirection = "down";
-                Debug.WriteLine("Moving Down");
-            }
-
-            // Animation frame update is handled separately
-        }
-
         public void UpdateAnimation(GameTime gameTime)
         {
-            TotalElapsed += gameTime.ElapsedGameTime.TotalSeconds;
-            if (TotalElapsed > TimePerFrame)
+            _animationTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            if (_animationTimer >= 1f / ANIMATION_FPS)
             {
-                CurrentFrame++;
-                if (CurrentFrame >= FrameCount)
-                {
-                    CurrentFrame = 0;
-                }
-                TotalElapsed -= TimePerFrame;
-                Debug.WriteLine($"Animation Frame: {CurrentFrame}");
+                CurrentFrame = (CurrentFrame + 1) % FrameCount;
+                _animationTimer = 0f;
             }
         }
 
         public void ResetAnimation()
         {
             MovementDirection = "idle";
-            TotalElapsed += TimePerFrame;
-            if (TotalElapsed > TimePerFrame)
-            {
-                CurrentFrame++;
-                if (CurrentFrame >= FrameCount)
-                {
-                    CurrentFrame = 0;
-                }
-                TotalElapsed -= TimePerFrame;
-                Debug.WriteLine($"Animation Frame: {CurrentFrame}");
-            }
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            // Determine the sprite effects based on the facing direction
-            var spriteEffects = IsFacingLeft ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+            Texture2D currentTexture;
+            Rectangle sourceRectangle;
 
-            // Draw the frog
-            Texture2D currentTexture = IdleAnimation;
             switch (MovementDirection)
             {
-                case "left":
-                case "right":
-                    currentTexture = MovementSpriteSheet;
-                    break;
                 case "up":
                     currentTexture = UpMovementSpriteSheet;
                     break;
                 case "down":
                     currentTexture = DownMovementSpriteSheet;
                     break;
-                default:
-                    currentTexture = IdleTexture;
+                case "left":
+                case "right":
+                    currentTexture = MovementSpriteSheet;
+                    break;
+                default: // "idle" or any other case
+                    currentTexture = IdleAnimation;
                     break;
             }
 
-            Rectangle destinationRectangle = new Rectangle((int)Position.X, (int)Position.Y, RenderWidth, RenderHeight);
-
-            if (MovementDirection == "idle")
+            if (currentTexture == null)
             {
-                // Calculate source rectangle for current animation frame
-                var sourceRectangle = new Rectangle(
-                    0, // X position of the frame
-                    CurrentFrame * FrameHeight, // Y position of the frame
-                    FrameWidth,
-                    FrameHeight
-                );
-
-                // Draw the current frame from sprite sheet
-                spriteBatch.Draw(
-                    IdleAnimation,
-                    destinationRectangle,
-                    sourceRectangle,
-                    Color.White,
-                    0f,
-                    new Vector2(FrameWidth / 2, FrameHeight / 2),
-                    spriteEffects,
-                    0f
-                );
+                Console.WriteLine($"Texture for {MovementDirection} movement is null.");
+                return;
             }
-            else
-            {
-                // Calculate source rectangle for current animation frame
-                var sourceRectangle = new Rectangle(
-                    0, // X position of the frame
-                    CurrentFrame * FrameHeight, // Y position of the frame
-                    FrameWidth,
-                    FrameHeight
-                );
 
-                // Draw the current frame from the sprite sheet
-                spriteBatch.Draw(
-                    currentTexture,
-                    destinationRectangle,
-                    sourceRectangle,
-                    Color.White,
-                    0f,
-                    new Vector2(FrameWidth / 2, FrameHeight / 2),
-                    spriteEffects,
-                    0f
-                );
-            }
+            // Calculate the source rectangle based on the current frame
+            sourceRectangle = new Rectangle(
+                0, // X position of the frame
+                CurrentFrame * FrameHeight, // Y position of the frame
+                FrameWidth,
+                FrameHeight
+            );
+
+            Rectangle destinationRectangle = new Rectangle(
+                (int)Position.X - RenderWidth / 2,
+                (int)Position.Y - RenderHeight / 2,
+                RenderWidth,
+                RenderHeight
+            );
+
+            SpriteEffects spriteEffects = IsFacingLeft ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+
+            spriteBatch.Draw(
+                currentTexture,
+                destinationRectangle,
+                sourceRectangle,
+                Color.White,
+                0f,
+                Vector2.Zero,
+                spriteEffects,
+                0f
+            );
         }
     }
 }
+

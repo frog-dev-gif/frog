@@ -4,3 +4,5 @@ bin/
 Content/bin/
 Content/obj/
 Content/obj/**/
+game_debug.txt
+error_log.txt

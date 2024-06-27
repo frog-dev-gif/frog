@@ -50,6 +50,12 @@
 /processorParam:TextureFormat=Color
 /build:movement-export.png
 
+#begin Music/SWAPPARTY.wav
+/importer:WavImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Music/SWAPPARTY.wav
+
 #begin test-map/IntGrid.intgrid.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -61,6 +67,11 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:test-map/IntGrid.intgrid.png
+
+#begin test-map/test-map-0.tmx
+/importer:TiledMapImporter
+/processor:TiledMapProcessor
+/build:test-map/test-map-0.tmx
 
 #begin test-map/test-map.tmx
 /importer:TiledMapImporter
@@ -151,10 +162,10 @@
 /processorParam:TextureFormat=Color
 /build:test-map/tilesheet-1.png
 
-#begin test-map/tilesheet-1.tsx
+#begin test-map/tilesheet.tsx
 /importer:TiledMapTilesetImporter
 /processor:TiledMapTilesetProcessor
-/build:test-map/tilesheet-1.tsx
+/build:test-map/tilesheet.tsx
 
 #begin test-map/void.png
 /importer:TextureImporter
